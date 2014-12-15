@@ -5,8 +5,8 @@ app = Flask(__name__)
 
 
 people = [
-            {'name':'jim',
-             'age' :42},
+            {'name':'james',
+             'age' :22},
 
             {'name':'john',
              'age' :19}
@@ -23,7 +23,13 @@ def get_person(name):
   print person
   return jsonify(person)
 
-@app.route('/api/people/', methods=['POST'])
+@app.route('/api/people', methods=['POST'])
 def post_person():
-  return request.get_json()
+  name = request.form['name']
+  age = request.form['age']
+  new_person = {'name':name,
+                'age' :age}
+  return jsonify(new_person)
 
+if (__name__) == "__main__":
+  app.run(debug=True)

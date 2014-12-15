@@ -38,17 +38,41 @@ def get_task(task_id):
 
 @app.route('/todo/api/v1.0/tasks', methods=['POST'])
 def create_task():
-  print request.get_data()
-  print request.json
-  if not request.json or not 'title' in request.json:
+  if not request.form or not 'title' in request.form:
       abort(400)
   task = {
       'id': tasks[-1]['id'] + 1,
-      'title': request.json['title'],
-      'description': request.json.get('description', ""),
+      'title': request.form['title'],
+      'description': request.form['description'],
       'done': False
   }
   tasks.append(task)
   return jsonify({'task': task}), 201
+
+@app.route('/todo/api/v1.0/tasks/<int:task_id>', methods=['PUT'])
+def update_task(task_id):
+  task = get_task_by_id(task_id)
+  if len(task) == 0:
+      abort(404)
+  if request['description']:
+    get_task_by_id(task_id)['description'] = request['description']
+  if request['title']:
+    get_task_by_id(task_id)['title'] = request['title']
+  if request['done']:
+    get_task_by_id(task_id)['done'] = request['done']
+  return jsonify({'task': get_task_by_id(task_id)}), 201
+
+@app.route('/todo/api/v1.0/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+  task = get_task_by_id(task_id)
+  if len(task) == 0:
+      abort(404)
+  else:
+    tasks.remove(get_task_by_id(task_id))
+  return jsonify({'tasks':tasks}), 201
+
+def get_task_by_id(task_id):
+  return filter(lambda t: t['id'] == task_id, tasks)
+
 if __name__ == '__main__':
     app.run(debug=True)
